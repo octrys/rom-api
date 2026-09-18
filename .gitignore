@@ -1,0 +1,7 @@
+node_modules/
+dist/
+logs/
+storage/
+*.db
+*.db-shm
+*.db-wal

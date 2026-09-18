@@ -1,0 +1,34 @@
+{
+    "auth": {
+        "host": "127.0.0.1",
+        "port": 8001,
+        "authHost": "rmauth.rom.octrys.dev",
+        "callbackPort": 7077,
+        "database": "storage/auth.db",
+        "authTokenTtlSeconds": 300,
+        "passwordMinLength": 8,
+        "passwordMaxLength": 200
+    },
+    "region": {
+        "host": "127.0.0.1",
+        "port": 8002,
+        "code": "sa",
+        "database": "storage/region.db",
+        "authInternalUrl": "http://127.0.0.1:8001",
+        "gameHost": "gateway-sa.rom.octrys.dev",
+        "gamePort": 17701,
+        "gameAltPort": 17700,
+        "clientVersion": "2023101315",
+        "sessionTtlSeconds": 86400,
+        "world": {
+            "worldId": 1,
+            "worldGroupId": 3,
+            "worldName": "OctrysServer",
+            "orderId": 1,
+            "status": 0,
+            "congestion": 1,
+            "newCreateUser": 1,
+            "manageEndDate": "2026-09-10T03:00:00"
+        }
+    }
+}

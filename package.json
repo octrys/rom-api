@@ -1,0 +1,38 @@
+{
+  "name": "rom-api",
+  "version": "1.0.0",
+  "description": "ROM: Golden Age emulator backend — identity (auth) and regional game API (region)",
+  "main": "dist/services/auth/index.js",
+  "scripts": {
+    "build": "tsc && mkdir -p dist/services/auth/web && cp -R src/services/auth/web/. dist/services/auth/web/",
+    "lint": "eslint .",
+    "auth:dev": "nodemon --exec ts-node src/services/auth/index.ts",
+    "auth:run": "node dist/services/auth/index.js",
+    "region:dev": "nodemon --exec ts-node src/services/region/index.ts",
+    "region:run": "node dist/services/region/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/octrys/rom-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.5.0",
+    "eslint": "^10.10.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^5.2.1",
+    "winston": "^3.19.0"
+  }
+}
