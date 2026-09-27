@@ -38,6 +38,13 @@ export class SessionStore {
     }
 
     private migrate(): void {
+        this.createTable();
+        // Bring older databases (created before single-use) up to date.
+        this.ensureColumn("consumed", "consumed INTEGER NOT NULL DEFAULT 0");
+        this.ensureIntegerCreatedAt();
+    }
+
+    private createTable(): void {
         this.db.exec(`
             CREATE TABLE IF NOT EXISTS sessions (
                 session_key INTEGER PRIMARY KEY,
@@ -48,15 +55,43 @@ export class SessionStore {
                 consumed    INTEGER NOT NULL DEFAULT 0
             )
         `);
-        // Bring older databases (created before single-use) up to date.
-        this.ensureColumn("consumed", "consumed INTEGER NOT NULL DEFAULT 0");
+    }
+
+    private columns(): { name: string; type: string }[] {
+        return this.db.prepare("PRAGMA table_info(sessions)").all() as { name: string; type: string }[];
     }
 
     private ensureColumn(name: string, ddl: string): void {
-        const columns = this.db.prepare("PRAGMA table_info(sessions)").all() as { name: string }[];
-        if (!columns.some((column) => column.name === name)) {
+        if (!this.columns().some((column) => column.name === name)) {
             this.db.exec(`ALTER TABLE sessions ADD COLUMN ${ddl}`);
         }
+    }
+
+    // Older databases declared created_at as TEXT (ISO strings, later numeric
+    // text like "1790490596.0"), which turns created_at + ttl into a string
+    // concatenation and expires sessions within a second. Rebuild the table
+    // with an INTEGER column, converting both legacy formats to Unix seconds.
+    private ensureIntegerCreatedAt(): void {
+        const createdAt = this.columns().find((column) => column.name === "created_at");
+        if (!createdAt || createdAt.type.toUpperCase() === "INTEGER") {
+            return;
+        }
+        const rebuild = this.db.transaction(() => {
+            this.db.exec("ALTER TABLE sessions RENAME TO sessions_legacy");
+            this.createTable();
+            this.db.exec(`
+                INSERT INTO sessions (session_key, account_id, user_code, world_id, created_at, consumed)
+                SELECT session_key, account_id, user_code, world_id,
+                       CASE WHEN created_at GLOB '*T*'
+                            THEN CAST(strftime('%s', created_at) AS INTEGER)
+                            ELSE CAST(created_at AS INTEGER)
+                       END,
+                       consumed
+                FROM sessions_legacy
+            `);
+            this.db.exec("DROP TABLE sessions_legacy");
+        });
+        rebuild();
     }
 
     // Allocates a session with a unique random session key, retrying on the
