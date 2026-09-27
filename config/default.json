@@ -17,7 +17,7 @@
         "authInternalUrl": "http://127.0.0.1:8001",
         "gameHost": "gateway-sa.rom.octrys.dev",
         "gamePort": 17701,
-        "gameAltPort": 17700,
+        "gameAltPort": 17701,
         "clientVersion": "2023101315",
         "sessionTtlSeconds": 86400,
         "world": {
